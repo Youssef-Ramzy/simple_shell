@@ -13,7 +13,7 @@ int main(void)
 
 	while (status)
 	{
-		printf("> ");
+		printf("$ ");
 		fgets(cmd, MAX_CMD_LEN, stdin);
 		parse_cmd(cmd, args);
 		if (strcmp(args[0], "exit") == 0)

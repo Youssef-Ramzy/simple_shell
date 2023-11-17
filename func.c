@@ -23,6 +23,12 @@ void parse_cmd(char *cmd, char **args)
  */
 int execute_cmd(char **args)
 {
+	if (access(args[0], F_OK) == -1)
+	{
+		fprintf(stderr, "%s: command not found\n", args[0]);
+		return (1);
+	}
+
 	pid_t pid = fork();
 
 	if (pid == -1)
@@ -32,7 +38,7 @@ int execute_cmd(char **args)
 	}
 	else if (pid == 0)
 	{
-		execvp(args[0], args);
+		execve(args[0], args, environ);
 		perror("Error");
 		exit(EXIT_FAILURE);
 	}
