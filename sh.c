@@ -6,8 +6,13 @@
 */
 void parse_cmd(char *cmd, char **args)
 {
-	args[0] = strtok(cmd, " \n");
-	args[1] = NULL;
+	int i = 0;
+
+	args[i] = strtok(cmd, " \n");
+	while (args[i] != NULL)
+	{
+		args[++i] = strtok(NULL, " \n");
+	}
 }
 /**
  * execute_cmd - execute a command
@@ -58,6 +63,7 @@ int execute_cmd(char **args, char *program_name)
 	}
 	return (1);
 }
+
 /**
  * main - simple shell main function
  * @argc: number of arguments
