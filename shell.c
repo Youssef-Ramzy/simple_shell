@@ -3,8 +3,8 @@
 /**
  * main - Entry point
  *
- * Return: Always 0
- */
+ * Return: EXIT_SUCCESS or EXIT_FAILURE
+*/
 int main(void)
 {
 	char cmd[MAX_CMD_LEN];
@@ -16,23 +16,26 @@ int main(void)
 		printf("$ ");
 		fgets(cmd, MAX_CMD_LEN, stdin);
 		parse_cmd(cmd, args);
-		if (strcmp(args[0], "exit") == 0)
+		if (args[0] != NULL)
 		{
-			status = 0;
-		}
-		else if (strcmp(args[0], "env") == 0)
-		{
-			char **env = environ;
-
-			while (*env)
+			if (strcmp(args[0], "exit") == 0)
 			{
-				printf("%s\n", *env);
-				env++;
+				status = 0;
 			}
-		}
-		else
-		{
-			status = execute_cmd(args);
+			else if (strcmp(args[0], "env") == 0)
+			{
+				char **env = environ;
+
+				while (*env)
+				{
+					printf("%s\n", *env);
+					env++;
+				}
+			}
+			else
+			{
+				status = execute_cmd(args);
+			}
 		}
 	}
 

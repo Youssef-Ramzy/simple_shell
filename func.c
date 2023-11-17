@@ -1,9 +1,9 @@
 #include "main.h"
+
 /**
- * parse_cmd - Parse a command line into arguments
- * @cmd: Command line
- * @args: Arguments array
- * Return: Nothing
+ * parse_cmd - Parses a command string into an array of arguments
+ * @cmd: The command string to parse
+ * @args: An array of strings to store the parsed arguments
  */
 void parse_cmd(char *cmd, char **args)
 {
@@ -16,14 +16,52 @@ void parse_cmd(char *cmd, char **args)
 		args[i] = strtok(NULL, " \n");
 	}
 }
+
 /**
- * execute_cmd - Execute a command
- * @args: Arguments array
- * Return: 1 on success, 0 on failure
+ * search_path - Searches for a command in the directories listed in PATH
+ * @cmd: The command to search for
+ *
+ * Return: The full path to the command if found, otherwise NULL
+ */
+char *search_path(char *cmd)
+{
+	char *path = getenv("PATH");
+	char *path_copy = strdup(path);
+	char *dir = strtok(path_copy, ":");
+
+	while (dir != NULL)
+	{
+		char *cmd_path = malloc(strlen(dir) + strlen(cmd) + 2);
+
+		strcpy(cmd_path, dir);
+		strcat(cmd_path, "/");
+		strcat(cmd_path, cmd);
+
+		if (access(cmd_path, X_OK) == 0)
+		{
+			free(path_copy);
+			return (cmd_path);
+		}
+
+		free(cmd_path);
+		dir = strtok(NULL, ":");
+	}
+
+	free(path_copy);
+	return (NULL);
+}
+
+/**
+ * execute_cmd - Executes a command with arguments
+ * @args: An array of strings containing the command and its arguments
+ *
+ * Return: 1 on success, otherwise an error code
  */
 int execute_cmd(char **args)
 {
-	if (access(args[0], F_OK) == -1)
+	char *cmd_path = search_path(args[0]);
+
+	if (cmd_path == NULL)
 	{
 		fprintf(stderr, "%s: command not found\n", args[0]);
 		return (1);
@@ -38,13 +76,14 @@ int execute_cmd(char **args)
 	}
 	else if (pid == 0)
 	{
-		execve(args[0], args, environ);
+		execve(cmd_path, args, environ);
 		perror("Error");
 		exit(EXIT_FAILURE);
 	}
 	else
 	{
 		wait(NULL);
+		free(cmd_path);
 		return (1);
 	}
 }
