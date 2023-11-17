@@ -13,6 +13,6 @@
 extern char **environ;
 
 void parse_cmd(char *cmd, char **args);
-int execute_cmd(char **args);
+int execute_cmd(char **args, char *program_name);
 
 #endif
