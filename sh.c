@@ -1,49 +1,67 @@
-#include "main.h"
+#include "shell.h"
 /**
- * parse_cmd - Entry point
- * @cmd: command
- * @args: arguments
- * Return: EXIT_SUCCESS or EXIT_FAILURE
- */
+ * parse_cmd - parse a command line into arguments
+ * @cmd: command line
+ * @args: array of arguments
+*/
 void parse_cmd(char *cmd, char **args)
 {
 	args[0] = strtok(cmd, " \n");
 	args[1] = NULL;
 }
-
 /**
- * execute_cmd - Execute a command
- * @args: The command and its arguments
- * @program_name: The name of the program
- * Return: 1 on success, 0 on failure
- */
+ * execute_cmd - execute a command
+ * @args: array of arguments
+ * @program_name: name of the program
+ * Return: 0 if the command is exit, 1 otherwise
+*/
 int execute_cmd(char **args, char *program_name)
 {
-	pid_t pid = fork();
+	char **env;
 
-	if (pid == -1)
+	if (strcmp(args[0], "exit") == 0)
 	{
-		perror("Error");
-		return (1);
+		return (0);
 	}
-	else if (pid == 0)
+	else if (strcmp(args[0], "env") == 0)
 	{
-		if (execve(args[0], args, environ) == -1)
+		for (env = environ; *env != 0; env++)
 		{
-			fprintf(stderr, "%s: 1: %s: not found\n", program_name, args[0]);
-			exit(EXIT_FAILURE);
+			char *thisEnv = *env;
+
+			printf("%s\n", thisEnv);
 		}
+		return (1);
 	}
 	else
 	{
-		wait(NULL);
-		return (1);
+		pid_t pid = fork();
+
+		if (pid == -1)
+		{
+			perror("Error");
+			return (1);
+		}
+		else if (pid == 0)
+		{
+			if (execve(args[0], args, environ) == -1)
+			{
+				fprintf(stderr, "%s: 1: %s: not found\n", program_name, args[0]);
+				exit(EXIT_FAILURE);
+			}
+		}
+		else
+		{
+			wait(NULL);
+			return (1);
+		}
 	}
+	return (1);
 }
 /**
- * main - Entry point
- * @argc: argument count
- * @argv: argument vector
+ * main - simple shell main function
+ * @argc: number of arguments
+ * @argv: array of arguments
  * Return: EXIT_SUCCESS or EXIT_FAILURE
 */
 int main(int argc, char **argv)
@@ -52,6 +70,7 @@ int main(int argc, char **argv)
 	char *args[MAX_ARGS];
 	int status = 1;
 
+	argc = argc;
 	while (status)
 	{
 		printf("$ ");
@@ -63,14 +82,7 @@ int main(int argc, char **argv)
 		parse_cmd(cmd, args);
 		if (args[0] != NULL)
 		{
-			if (strcmp(args[0], "exit") == 0)
-			{
-				status = 0;
-			}
-			else
-			{
-				status = execute_cmd(args, argv[0]);
-			}
+			status = execute_cmd(args, argv[0]);
 		}
 	}
 
