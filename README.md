@@ -1,4 +1,4 @@
-# simple shell project
+# simple_shell project
 That project was crazy hard.
 
 # Authors
