@@ -10,8 +10,8 @@ int main(int argc, char *argv[], char *environ[])
 	argv[argc - 1] = argv[argc - 1];
 	while (environ[i])
 	{
-		write(1, environ[i], strlen(environ[i]));
-		write(1, "\n", 1);
+		printf(environ[i]);
+		printf("\n");
 		i++;
 	}
 	return (0);
